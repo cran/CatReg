@@ -4,15 +4,14 @@
 \alias{predict.scope}
 \title{Computes SCOPE predictions}
 \usage{
-\method{predict}{scope}(object, newdata, interceptxlinear = FALSE, ...)
+\method{predict}{scope}(object, newdata, include_intercept = TRUE, ...)
 }
 \arguments{
 \item{object}{SCOPE model as outputted by scope. Must have simply.the.best = TRUE}
 
 \item{newdata}{New covariates on which to make predictions. Must be of the same form as the model was trained on}
 
-\item{interceptxlinear}{If intercept is to be included in the model and is not in the column span of the continuous variables in x, set to FALSE (default).
-Must match format of training data.}
+\item{include_intercept}{If TRUE, a column of 1s will be added to the (continuous) design matrix. Must match format of training data.}
 
 \item{...}{Additional arguments to pass to other \code{predict} methods}
 }

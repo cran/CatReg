@@ -4,7 +4,7 @@
 \alias{predict.scope.logistic}
 \title{Computes SCOPE logistic predictions}
 \usage{
-\method{predict}{scope.logistic}(object, newdata, probs = TRUE, interceptxlinear = FALSE, ...)
+\method{predict}{scope.logistic}(object, newdata, probs = TRUE, include_intercept = TRUE, ...)
 }
 \arguments{
 \item{object}{SCOPE model as outputted by scope.logistic. Must have simply.the.best = TRUE}
@@ -13,8 +13,7 @@
 
 \item{probs}{If TRUE returns probabilities, if FALSE returns binary predictions}
 
-\item{interceptxlinear}{If intercept is to be included in the model and is not in the column span of the continuous variables in x, set to FALSE (default).
-Must match format of training data.}
+\item{include_intercept}{If TRUE, a column of 1s will be added to the (continuous) design matrix. Must match format of training data.}
 
 \item{...}{Additional arguments to pass to other \code{predict} methods}
 }

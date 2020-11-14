@@ -28,7 +28,7 @@ core_scope = function ( y, xlinear, xshrink, blockorder, fold, gamma, AIC, mBICc
   }
 
   if ( is.null(dim(lambdaseq)) ) {
-    lambdaseq = as.matrix(lambdaseq)
+    lambdaseq = t(as.matrix(lambdaseq)) # Sept2020
   }
   pathlength = dim(lambdaseq)[ 2 ]
   # If not fold 1, augments the solution path to be safe that we start from the initial solution being zero for all categorical variables
@@ -104,7 +104,7 @@ core_scope = function ( y, xlinear, xshrink, blockorder, fold, gamma, AIC, mBICc
                                                                                                   subaverages[[ blockorder[ j ] ]][ weightsbool[[ blockorder[ j ] ]]], gamma, lambda)
 
 
-          # Commented out -- line to force solution to satisfy weighted sum-to-zero constraint (that solution *should* satisfy anyway)
+          # Commented out -- line to force solution to satisfy weighted sum-to-zero constraint (that solution should satisfy anyway)
           # coefficientshrink[[ blockorder[ j ] ]][ weightsbool[[ blockorder[ j ] ]], l ] = coefficientshrink[[ blockorder[ j ] ]][ weightsbool[[ blockorder[ j ] ]], l ] - sum(weights[[ blockorder[ j ] ]][ weightsbool[[ blockorder[ j ] ]] ] * coefficientshrink[[ blockorder[ j ] ]][ weightsbool[[ blockorder[ j ] ]], l ])
 
           # Computes penalty contribution to objective for variable blockorder[ j ]

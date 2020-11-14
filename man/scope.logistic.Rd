@@ -7,91 +7,83 @@
 scope.logistic(
   x,
   y,
-  gamma = 100,
-  sd = NULL,
-  AIC = TRUE,
-  mBICconstant = 5,
-  default.lambdaseq = TRUE,
-  default.length = 160,
-  lambda.min.ratio = 0.005,
-  lambdaseq = NULL,
-  TerminateEpsilon = 1e-07,
-  interceptxlinear = FALSE,
-  max.iter = 1000,
-  max.out.iter = 1000,
-  BICearlystop = TRUE,
-  BICterminate = 25,
+  gamma = 8,
+  lambda = NULL,
+  nlambda = 100,
+  lambda_min_ratio = 0.01,
+  nfolds = 5,
+  include_intercept = TRUE,
+  return_full_beta = FALSE,
+  max_iter = 1000,
+  max_out_iter = 1000,
+  early_stopping = ifelse(pshrink > 1, TRUE, FALSE),
+  early_stopping_rounds = 20,
+  early_stopping_criterion = "AIC",
+  noise_variance = NULL,
+  terminate_eps = 1e-07,
   silent = TRUE,
-  K = 5,
-  return.full.beta = FALSE,
-  simply.cross.validated = FALSE,
-  grid.safe = 10,
-  blockorder = NULL,
-  FoldAssignment = NULL,
-  zero.penalty = FALSE
+  only_cross_validate = FALSE,
+  grid_safe = 10,
+  block_order = NULL,
+  fold_assignment = NULL,
+  zero_penalty = FALSE
 )
 }
 \arguments{
-\item{x}{Data frame of covariates. Can include a mix of continuous and categorical covariates (no scaling of continuous covariates is performed within the program). By default an
-intercept will be added; see interceptxlinear}
+\item{x}{Data frame of covariates: Can include a mix of continuous and categorical variables (no scaling of continuous covariates is performed within the program).
+By default an intercept will be added to the linear part; see include_intercept}
 
 \item{y}{Response vector of length n}
 
 \item{gamma}{Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty}
 
-\item{sd}{Standard deviation of noise used for calibration of parameter lambda. This is recommended to be left alone}
+\item{lambda}{If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be strictly positive and each row decreasing}
 
-\item{AIC}{Controls whether information criterion for early stopping is AIC (=TRUE) or mBIC (=FALSE)}
+\item{nlambda}{Length of default sequence of lambda values generated if lambda = NULL}
 
-\item{mBICconstant}{If using mBIC, this is the parameter m}
+\item{lambda_min_ratio}{Ratio of largest to smallest value on default sequence of lambda values}
 
-\item{default.lambdaseq}{If using automatically generated sequence of lambda values set to TRUE. Do not set to FALSE without good reason}
+\item{nfolds}{Number of folds in cross-validation. If nfolds = 1, no cross-validation is performed}
 
-\item{default.length}{Length of sequence of automatically generated lambda values}
+\item{include_intercept}{If TRUE, a column of 1s will be added to the (continuous) design matrix}
 
-\item{lambda.min.ratio}{Ratio of largest to smallest value on sequence of lambda values}
+\item{return_full_beta}{If TRUE with cross-validation, the entire solution path will be returned instead of just the optimal point}
 
-\item{lambdaseq}{If default.lambdaseq = FALSE then add path of lambda values here}
+\item{max_iter}{Maximum number of iterations at each local quadratic approximation}
 
-\item{TerminateEpsilon}{Epsilon for convergence criterion, is multiplied by null deviance to get terminate criterion for objective value}
+\item{max_out_iter}{Maximum number of local quadratic approximations at each value of lambda}
 
-\item{interceptxlinear}{If intercept is to be included in the model and is not in the column span of the continuous variables in x, set to FALSE (default).}
+\item{early_stopping}{Early stopping based on information criterion. By default is TRUE if there are more than 1 categorical variables}
 
-\item{max.iter}{Maximum number of iterations at each local quadratic approximation}
+\item{early_stopping_rounds}{Number of iterations that information criterion must have not decreased for to terminate}
 
-\item{max.out.iter}{Maximum number of local quadratic approximations at each value of lambda}
+\item{early_stopping_criterion}{If "AIC", Akaike Information Criterion is used for early stopping. Otherwise if a positive number is given, modified Bayes Information Criterion is used with this integer as the parameter (CITE)}
 
-\item{BICearlystop}{If information criterion is to be used to stop computation early, set to TRUE}
+\item{noise_variance}{If noise variance is known, this will be used for scaling the default values of lambda. Otherwise this will be scaled automatically}
 
-\item{BICterminate}{Specifies how many values of lambda to be computed after the minimum value of the information criterion is reached}
+\item{terminate_eps}{Epsilon for convergence criterion, is multiplied by null deviance to get terminate criterion for objective value}
 
-\item{silent}{If FALSE then progress updates will be printed as solutions are computed}
+\item{silent}{If FALSE then progress updates will be printed as solutions are computed. Useful for tuning and diagnosing convergence issues.}
 
-\item{K}{Number of folds in cross-validation. If K = 1, no cross-validation is performed}
+\item{only_cross_validate}{If TRUE then cross-validation scores for each value of lambda will be returned, but not the estimates themselves}
 
-\item{return.full.beta}{If TRUE then beta.full will be returned, else just the cross-validation optimal beta.best will be returned}
+\item{grid_safe}{As the automatically generated sequence of lambda values is adjusted during the first fold but fixed thereafter. For subsequent folds, this sets computation to begin at a larger value of lambda to ensure that the first solution along the path is zero so as to maintain the advantages of the pathwise approach. This specifies how many larger values of lambda should be used}
 
-\item{simply.cross.validated}{If TRUE then cross-validation scores for each value of lambda will be returned, but not the estimates themselves}
+\item{block_order}{By default the order in block coordinate descent is randomly sampled. Alternatively a permutation vector can be included here}
 
-\item{grid.safe}{As the automatically generated sequence of lambda values is adjusted during the first fold but fixed thereafter. For subsequent folds, this sets computation to
-begin at a larger value of lambda to ensure that the first solution along the path is zero so as to maintain the advantages of the pathwise approach. This specifies how many larger
-values of lambda should be used}
+\item{fold_assignment}{By default the assignments for cross-validation are randomly sampled automatically. Alternatively assignments can be included here}
 
-\item{blockorder}{By default the order in block coordinate descent is randomly sampled. Alternatively a permutation vector can be included here}
-
-\item{FoldAssignment}{By default the assignments for cross-validation are randomly sampled automatically. Alternatively assignments can be included here}
-
-\item{zero.penalty}{Fits logistic regression model with zero penalty. Primarily used for debugging, do not set to TRUE}
+\item{zero_penalty}{Fits unpenalised logistic regression model. Used for testing purposes only.}
 }
 \value{
 A list of objects. Some may not be returned depending on value of arguments K, simply.cross.validated, return.full.beta.
 \itemize{
-\item lambdaseq - A matrix of the values of lambda used to compute the solution path. Columns correspond to different points on the path, rows correspond to the categorical
+\item lambda - A matrix of the values of lambda used to compute the solution path. Columns correspond to different points on the path, rows correspond to the categorical
 variables. Lambda is scaled depending on the number of categories present in the data.
-\item cverrors - Provided K > 1 then the cross-validation error for each point on the grid will be returned
-\item beta.full - Contains full solution path. If K > 1 then will only be returned if simply.cross.validated = FALSE and return.full.beta = TRUE. First object [[ 1 ]] is
+\item cverrors - Provided nfolds > 1 then the cross-validation error for each point on the grid will be returned
+\item beta.full - Contains full solution path. If nfolds > 1 then will only be returned if simply.cross.validated = FALSE and return.full.beta = TRUE. First object [[ 1 ]] is
 coefficients of continuous variables, [[ 2 ]] is a list of coefficients for categorical variables
-\item beta.best - Contains solution at CV-optimal point. Requires K > 1 to be returned. This must not be NULL in order to use predict.scope. First object [[ 1 ]] is coefficients of
+\item beta.best - Contains solution at CV-optimal point. Requires nfolds > 1 to be returned. This must not be NULL in order to use predict.scope. First object [[ 1 ]] is coefficients of
 continuous variables, [[ 2 ]] is a list of coefficients for categorical variables
 \item fold.assign - Contains fold assignments for cross-validation
 }
@@ -99,7 +91,7 @@ continuous variables, [[ 2 ]] is a list of coefficients for categorical variable
 \description{
 Computes solution for SCOPE logistic models, computing along a path and iterating local quadratic approximations at each point. Performs K-fold cross-validation
 for regularisation parameter lambda and can incorporate both linear and categorical (including logical) variables. This function uses a Proximal Newton algorithm and is not guaranteed to converge. It is
-recommended for developer use only. See Stokell, Shah and Tibshirani (2020).
+recommended for developer use only.
 }
 \examples{
 \dontrun{
@@ -110,8 +102,4 @@ scope_mod = scope.logistic(x, y)
 x_new = UniformDesignMatrix(10, 5, 5)
 predict(scope_mod, x_new)
 }
-
-}
-\references{
-\insertRef{stokell2020modelling}{CatReg}
 }

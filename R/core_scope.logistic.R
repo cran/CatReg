@@ -45,7 +45,7 @@ core_scope.logistic = function ( y, xlinear, xshrink, blockorder, fold, gamma, A
   }
 
   if ( is.null(dim(lambdaseq)) ) {
-    lambdaseq = as.matrix(lambdaseq)
+    lambdaseq = t(as.matrix(lambdaseq)) # Sept2020
   }
 
   pathlength = dim(lambdaseq)[ 2 ]

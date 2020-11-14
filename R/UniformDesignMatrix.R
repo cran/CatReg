@@ -46,7 +46,7 @@ UniformDesignMatrix = function( n, p, c ) {
       finalmatrix[ i, j ] = paste0(longletters()[ emptymatrix[ i, j ] ], j)
     }
   }
-  finalmatrix = as.data.frame(finalmatrix)
+  finalmatrix = as.data.frame(finalmatrix, stringsAsFactors = TRUE)
   return(finalmatrix)
 }
 
@@ -91,6 +91,6 @@ CorrelatedDesignMatrix = function( n, cov_mat, c ) {
       finalmatrix[ i, j ] = paste0(longletters()[ emptymatrix[ i, j ] ], j)
     }
   }
-  finalmatrix = as.data.frame(finalmatrix)
+  finalmatrix = as.data.frame(finalmatrix, stringsAsFactors = TRUE)
   return(finalmatrix)
 }
