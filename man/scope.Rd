@@ -35,7 +35,7 @@ By default an intercept will be added to the linear part; see include_intercept}
 
 \item{gamma}{Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty}
 
-\item{lambda}{If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be strictly positive and each row decreasing}
+\item{lambda}{If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be non-negative and each row decreasing. Note that if lambda = 0 then no shrinkage will occur.}
 
 \item{nlambda}{Length of default sequence of lambda values generated if lambda = NULL}
 

@@ -10,7 +10,7 @@
 #' By default an intercept will be added to the linear part; see include_intercept
 #' @param y Response vector of length n
 #' @param gamma Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty
-#' @param lambda If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be strictly positive and each row decreasing
+#' @param lambda If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be non-negative and each row decreasing. Note that if lambda = 0 then no shrinkage will occur.
 #' @param nlambda Length of default sequence of lambda values generated if lambda = NULL
 #' @param lambda_min_ratio Ratio of largest to smallest value on default sequence of lambda values
 #' @param nfolds Number of folds in cross-validation. If nfolds = 1, no cross-validation is performed

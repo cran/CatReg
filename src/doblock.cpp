@@ -39,47 +39,13 @@ struct var_struct
   NumericMatrix OutputMatrixB;
   int IterationCounter;
   bool FinishIteratation;
-  var_struct();
 };
-
-
-var_struct::var_struct()
-{
-  CurrentPiece = 0;
-  RangePiece = 0;
-  y = 0.0;
-  MinimizerA = 0.0;
-  MinimizerB = 0.0;
-  MinimizerC = 0.0;
-  MinimizerWhich = 0;
-  MinimizerPiece = 0;
-  KnotTracker = 0;
-  Scratch = FALSE;
-  NewMinimizerKnown = FALSE;
-  WasLastIntersect = FALSE;
-  LastIntersectUpperRootTrue = FALSE;
-  LastIntersectWhich = 0;
-  LastIntersectPiece = 0;
-  ActiveA = 0;
-  IntersectHowMany = 0;
-  IntersectCounter = 0;
-  ActiveIntersectA = FALSE;
-  ActiveIntersectC = FALSE; 
-  OutputCounter = 0;
-  IterationCounter = 0;
-  FinishIteratation = FALSE;
-}
-
-
-
 
 struct ab_struct
 {
   NumericVector TypeAKnot, TypeAValue, TypeBLeftKnot, TypeBRightKnot, TypeBCoefA, TypeBCoefB, TypeBCoefC;
   LogicalVector IsTypeA, IsTypeB, TypeBEnding;
 };
-
-
 
 
 
@@ -146,6 +112,10 @@ NumericVector DoBlock( const NumericVector weight, const NumericVector response,
       OverallMean += weight[ i ] * response[ i ];
     }
     return NumericVector(response.size(), OverallMean); //Skip all computation if we satisfy the conditions of null-consistency lemma
+  }
+  else if ( lambda == 0 )
+  {
+    return response; // if lambda = 0, then no shrinkage, and the response can be returned as-is.
   }
   else
   {

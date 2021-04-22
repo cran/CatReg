@@ -12,7 +12,7 @@
 #' By default an intercept will be added to the linear part; see include_intercept
 #' @param y Response vector of length n
 #' @param gamma Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty
-#' @param lambda If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be strictly positive and each row decreasing
+#' @param lambda If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be non-negative and each row decreasing. Note that if lambda = 0 then no shrinkage will occur.
 #' @param nlambda Length of default sequence of lambda values generated if lambda = NULL
 #' @param lambda_min_ratio Ratio of largest to smallest value on default sequence of lambda values
 #' @param nfolds Number of folds in cross-validation. If nfolds = 1, no cross-validation is performed
@@ -152,8 +152,8 @@ scope = function ( x, y, gamma = 8, lambda = NULL, nlambda = 100, lambda_min_rat
     # equal size categories) then they'll have consistent scaling for recovery of true (intercept-only) solution
   } else { 
 
-    if (sum(lambda <= 0) > 0) {
-      stop('All lambda values must be strictly positive')
+    if (sum(lambda < 0) > 0) {
+      stop('All lambda values must be nonnegative')
     } else if (dim(lambda)[ 1 ] != pshrink) {
       stop('lambda must be pshrink times pathlength matrix with each row a positive decreasing sequence')
     } else for (j in 1:pshrink) {
