@@ -35,7 +35,7 @@ By default an intercept will be added to the linear part; see include_intercept}
 
 \item{y}{Response vector of length n}
 
-\item{gamma}{Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty}
+\item{gamma}{Concavity parameter in MCP; see Zhang (2010)}
 
 \item{lambda}{If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be non-negative and each row decreasing. Note that if lambda = 0 then no shrinkage will occur.}
 
@@ -57,7 +57,7 @@ By default an intercept will be added to the linear part; see include_intercept}
 
 \item{early_stopping_rounds}{Number of iterations that information criterion must have not decreased for to terminate}
 
-\item{early_stopping_criterion}{If "AIC", Akaike Information Criterion is used for early stopping. Otherwise if a positive number is given, modified Bayes Information Criterion is used with this integer as the parameter (CITE)}
+\item{early_stopping_criterion}{If "AIC", Akaike Information Criterion is used for early stopping. Otherwise if a positive number is given, modified Bayes Information Criterion is used with this integer as the parameter (Wang et al., 2009)}
 
 \item{noise_variance}{If noise variance is known, this will be used for scaling the default values of lambda. Otherwise this will be scaled automatically}
 
@@ -102,4 +102,10 @@ scope_mod = scope.logistic(x, y)
 x_new = UniformDesignMatrix(10, 5, 5)
 predict(scope_mod, x_new)
 }
+
+}
+\references{
+\insertRef{zhang2010}{CatReg}
+
+\insertRef{wangli2009}{CatReg}
 }

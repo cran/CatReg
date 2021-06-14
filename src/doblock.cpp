@@ -154,7 +154,7 @@ NumericVector DoBlock( const NumericVector weight, const NumericVector response,
         {
           IsFinalA[ i ] = ( ( FinalAKnot[ i ] - ( gamma * lambda ) <= RightKnot[ i ] )
                               and ( FinalAKnot[ i ] - ( gamma * lambda ) >= LeftKnot[ i ] ) );
-          if ( IsFinalA[ i ] == TRUE )
+          if ( IsFinalA[ i ] == true )
           {
             FinalAValue[ i ] = - ( pow(CoefB[ i ], 2) ) / ( 4 * CoefA[ i ] ) + CoefC[ i ] + ( 0.5 * gamma * pow(lambda, 2) );
           }
@@ -166,7 +166,7 @@ NumericVector DoBlock( const NumericVector weight, const NumericVector response,
       int FinalMinPiece = 0;
       for ( int i = 0; i < FinalPieceNumber; ++i )
       {
-        if ( IsFinalA[ i ] == TRUE )
+        if ( IsFinalA[ i ] == true )
         {
           if ( FinalAValue[ i ] - FinalMinValue < 0 )
           {
@@ -236,11 +236,11 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
   vs.WhichRemove = IntegerVector(UpperBoundPieces);
   vs.PieceRemove = IntegerVector(UpperBoundPieces);
 
-  vs.Scratch = TRUE;
-  vs.NewMinimizerKnown = TRUE;
+  vs.Scratch = true;
+  vs.NewMinimizerKnown = true;
 
   vs.ActiveA = -1;
-  vs.ActiveB = LogicalVector(NumberOfPieces, FALSE);
+  vs.ActiveB = LogicalVector(NumberOfPieces, false);
 
   vs.IntersectLocation = NumericVector(UpperBoundPieces);
   vs.IntersectWhich = IntegerVector(UpperBoundPieces);
@@ -253,9 +253,9 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
   vs.IntersectHowMany = 0;
   vs.IntersectCounter = -1;
 
-  vs.ActiveIntersectA = FALSE;
-  vs.ActiveIntersectB = LogicalVector(NumberOfPieces, FALSE);
-  vs.ActiveIntersectC = FALSE;
+  vs.ActiveIntersectA = false;
+  vs.ActiveIntersectB = LogicalVector(NumberOfPieces, false);
+  vs.ActiveIntersectC = false;
 
   vs.OutputCounter = -1;
 
@@ -267,8 +267,15 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
 
   vs.OutputMatrixB = NumericMatrix(2 * vs.IterationCounter - 2, UpperBoundPieces);
   vs.OLeftKnot[ 0 ] = -INFINITY;
-  vs.FinishIteratation = FALSE;
+  vs.FinishIteratation = false;
 
+
+  vs.y = vs.MinimizerA = vs.MinimizerB = vs.MinimizerC = 0.0;
+  vs.MinimizerWhich = vs.MinimizerPiece = 0;
+  vs.WasLastIntersect = vs.LastIntersectUpperRootTrue = false;
+  vs.LastIntersectWhich = vs.LastIntersectPiece = 0;
+
+  
   // This next short section ensures that the basic properties of continuity, and semicontinuity of the first derivative, hold
   // (and fix them if they don't). This is not strictly needed
   double LeftValue, RightValue, LeftDerivative, RightDerivative;
@@ -312,7 +319,7 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
       zs.TypeAKnot[ i ] = - CoefB[ i ] / ( 2 * CoefA[ i ] ) + ( gamma * lambda );
       zs.IsTypeA[ i ] = ( ( zs.TypeAKnot[ i ] - ( gamma * lambda ) <= RightKnot[ i ] )
                             and ( zs.TypeAKnot[ i ] - ( gamma * lambda ) >= LeftKnot[ i ] ) );
-      if ( zs.IsTypeA[ i ] == TRUE )
+      if ( zs.IsTypeA[ i ] == true )
       {
         zs.TypeAValue[ i ] = - ( pow(CoefB[ i ], 2) ) / ( 4 * CoefA[ i ] ) + CoefC[ i ] + ( 0.5 * gamma * pow(lambda, 2) );
       }
@@ -326,7 +333,7 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
       zs.TypeBRightKnot[ i ] = min(gamma * ( lambda - CoefB[ i ] ) - ( 2 * CoefA[ i ] * gamma - 1) * LeftKnot[ i ],
                                    gamma * lambda - ( CoefB[ i ] / ( 2 * CoefA[ i ] ) ));
       zs.IsTypeB[ i ] = ( zs.TypeBLeftKnot[ i ] - zs.TypeBRightKnot[ i ] + tol1 < 0 );
-      if ( zs.IsTypeB[ i ] == TRUE )
+      if ( zs.IsTypeB[ i ] == true )
       {
         zs.TypeBEnding[ i ] = ( gamma * lambda - ( CoefB[ i ] / ( 2 * CoefA[ i ] ) )
                                   < gamma * ( lambda - CoefB[ i ] ) - ( 2 * CoefA[ i ] * gamma - 1) * LeftKnot[ i ] );
@@ -349,17 +356,17 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
 
     // Now we start at -INFINITY and quickly proceed until the first stationary minimum of the input function. Before this point,
     // the derivative is strictly negative, so we know that the minimizer will be of Type C (without any further calculation necessary)
-    bool FoundA = FALSE;
+    bool FoundA = false;
     int JumpToPiece = -1;
-    while ( ( FoundA == FALSE ) and ( JumpToPiece < NumberOfPieces - 1 ) )
+    while ( ( FoundA == false ) and ( JumpToPiece < NumberOfPieces - 1 ) )
     {
       ++JumpToPiece;
-      if ( zs.IsTypeA[ JumpToPiece ] == TRUE )
+      if ( zs.IsTypeA[ JumpToPiece ] == true )
       {
-        FoundA = TRUE;
+        FoundA = true;
       }
     }
-    if ( ( FoundA == TRUE ) and ( JumpToPiece > 0 ) )
+    if ( ( FoundA == true ) and ( JumpToPiece > 0 ) )
     {
       for ( int i = 0 ; i < JumpToPiece; ++i )
       {
@@ -395,7 +402,7 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
           vs.ActiveA = vs.PieceAdd[ vs.KnotTracker ];
           break;
         case 2:
-          vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = TRUE;
+          vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = true;
           break;
         case 3:
           vs.CurrentPiece = vs.PieceAdd[ vs.KnotTracker ];
@@ -406,7 +413,7 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
         case 0:
           break;
         case 2:
-          vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] = FALSE;
+          vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] = false;
           break;
         case 3:
           break;
@@ -418,12 +425,12 @@ void DoIteration( const double& NextWeight, const double& NextResponse, const in
       vs.MinimizerA = CoefA[ vs.CurrentPiece ];
       vs.MinimizerB = CoefB[ vs.CurrentPiece ];
       vs.MinimizerC = CoefC[ vs.CurrentPiece ];
-      vs.Scratch = TRUE;
-      vs.NewMinimizerKnown = TRUE;
+      vs.Scratch = true;
+      vs.NewMinimizerKnown = true;
     }
 
     // We now have the main loop of the iteration -- we continue this until we arrive at +INFINITY
-    while ( vs.FinishIteratation == FALSE )
+    while ( vs.FinishIteratation == false )
     {
       Compute(UpperBoundPieces, zs, vs, InputMatrixB, gamma, lambda);
     }
@@ -480,7 +487,7 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
   //of Type A), then addition of Type A (if not already added)
   for ( int i = 0; i < NumberOfPieces; ++i )
   {
-    if ( zs.IsTypeB[ i ] == TRUE )
+    if ( zs.IsTypeB[ i ] == true )
     {
       // Add in the Type B startpoint (the left knot)
       ++KnotCounter;
@@ -495,12 +502,12 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
       vs.WhichRemove[ KnotCounter ] = 2;
       vs.PieceRemove[ KnotCounter ] = i;
       // Now consider if the end of the Type B coincides with the introduction of a Type A
-      if ( (zs.TypeBEnding[ i ] == TRUE) and (zs.IsTypeA[ i ] == TRUE) )
+      if ( (zs.TypeBEnding[ i ] == true) and (zs.IsTypeA[ i ] == true) )
       {
         vs.WhichAdd[ KnotCounter ] = 1;
         vs.PieceAdd[ KnotCounter ] = i;
       }
-      else if ( zs.IsTypeA[ i ] == TRUE )
+      else if ( zs.IsTypeA[ i ] == true )
       {
         // If not, then still want to add in a Type A for this piece if we have that one exists for this piece
         ++KnotCounter;
@@ -511,7 +518,7 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
         vs.PieceRemove[ KnotCounter ] = 0;
       }
     }
-    else if ( zs.IsTypeA[ i ] == TRUE )
+    else if ( zs.IsTypeA[ i ] == true )
     {
       // If we have Type A but no Type B, we need to make sure that we still include that
       ++KnotCounter;
@@ -532,7 +539,7 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
   vs.PieceRemove = vs.PieceRemove[ KnotOrder ];
 
   // This short routine combines two knots that are almost at the same location
-  LogicalVector KnotCounterKeep(KnotCounter + 1, TRUE);
+  LogicalVector KnotCounterKeep(KnotCounter + 1, true);
   int OldKnotCounter = KnotCounter;
   for ( int i = 0; i < OldKnotCounter; ++i )
   {
@@ -543,7 +550,7 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
       vs.PieceAdd[ i ] += vs.PieceAdd[ i + 1 ];
       vs.WhichRemove[ i ] += vs.WhichRemove[ i + 1 ];
       vs.PieceRemove[ i ] += vs.PieceRemove[ i + 1 ];
-      KnotCounterKeep[ i + 1 ] = FALSE;
+      KnotCounterKeep[ i + 1 ] = false;
       KnotCounter -= 1;
     }
   }
@@ -559,7 +566,7 @@ void KnotMatrixCreator( const ab_struct& zs, var_struct& vs, const double& gamma
 void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrixB, const double& gamma, const double& lambda )
 {
   // This function decides what should be done when the next event is a change in the active set
-  bool JustAdd = FALSE;
+  bool JustAdd = false;
   double CandidateA, CandidateB, CandidateC;
   vs.y = vs.KnotLocation[ vs.KnotTracker ];
   vs.RangePiece = WhichPiece(vs.LeftKnot, vs.y - ( gamma * lambda ));
@@ -568,13 +575,13 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
   switch (vs.WhichRemove[ vs.KnotTracker ])
   {
   case 0:
-    JustAdd = TRUE;
+    JustAdd = true;
     break;
   case 2:
-    if ( vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] == TRUE )
+    if ( vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] == true )
     {
-      vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] = FALSE;
-      if ( vs.ActiveIntersectB[ vs.PieceRemove[ vs.KnotTracker ] ] == TRUE )
+      vs.ActiveB[ vs.PieceRemove[ vs.KnotTracker ] ] = false;
+      if ( vs.ActiveIntersectB[ vs.PieceRemove[ vs.KnotTracker ] ] == true )
       {
         IntersectRemove(2, vs.PieceRemove[ vs.KnotTracker ], vs, gamma, lambda);
       }
@@ -584,23 +591,23 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
         {
           vs.ActiveA = vs.PieceAdd[ vs.KnotTracker ];
           UpdateOutput(1, vs.ActiveA, zs, vs, InputMatrixB, gamma, lambda);
-          vs.Scratch = TRUE;
-          vs.NewMinimizerKnown = TRUE;
-          vs.WasLastIntersect = FALSE;
+          vs.Scratch = true;
+          vs.NewMinimizerKnown = true;
+          vs.WasLastIntersect = false;
         }
         else if ( vs.WhichAdd[ vs.KnotTracker ] == 2 )
         {
-          vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = TRUE;
+          vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = true;
           UpdateOutput(2, vs.PieceAdd[ vs.KnotTracker ], zs, vs, InputMatrixB, gamma, lambda);
-          vs.Scratch = TRUE;
-          vs.NewMinimizerKnown = TRUE;
-          vs.WasLastIntersect = FALSE;
+          vs.Scratch = true;
+          vs.NewMinimizerKnown = true;
+          vs.WasLastIntersect = false;
         }
         else
         {
-          vs.Scratch = TRUE; // Scratch tells Compute that it needs to construct the entire new set of intersections
-          vs.NewMinimizerKnown = FALSE;
-          vs.WasLastIntersect = FALSE;
+          vs.Scratch = true; // Scratch tells Compute that it needs to construct the entire new set of intersections
+          vs.NewMinimizerKnown = false;
+          vs.WasLastIntersect = false;
         }
       }
       else if ( vs.WhichAdd[ vs.KnotTracker ] == 1 )
@@ -622,7 +629,7 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
       else if ( vs.WhichAdd[ vs.KnotTracker ] == 2 )
       {
         // If we also add in a type B minimizer but we weren't on the current minimizer before
-        vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = TRUE;
+        vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = true;
         IntersectAddOuter(2, vs.PieceAdd[ vs.KnotTracker ], zs, vs, gamma, lambda);
       }
     }
@@ -634,11 +641,11 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
     if ( ( vs.MinimizerWhich == 3 ) and ( vs.MinimizerPiece == vs.PieceRemove[ vs.KnotTracker ] ) )
     {
       UpdateOutput(3, vs.PieceAdd[ vs.KnotTracker ], zs, vs, InputMatrixB, gamma, lambda);
-      vs.Scratch = TRUE;
-      vs.NewMinimizerKnown = TRUE;
-      vs.WasLastIntersect = FALSE;
+      vs.Scratch = true;
+      vs.NewMinimizerKnown = true;
+      vs.WasLastIntersect = false;
     }
-    else if ( vs.ActiveIntersectC == TRUE )
+    else if ( vs.ActiveIntersectC == true )
     {
       IntersectRemove(3, vs.PieceRemove[ vs.KnotTracker ], vs, gamma, lambda);
       IntersectAddOuter(3, vs.PieceAdd[ vs.KnotTracker ], zs, vs, gamma, lambda);
@@ -650,7 +657,7 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
     break;
   }
 
-  if ( JustAdd == TRUE )
+  if ( JustAdd == true )
   {
     switch (vs.WhichAdd[ vs.KnotTracker ])
     {
@@ -661,11 +668,11 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
         CandidateA = 0;
         CandidateB = 0;
         CandidateC = zs.TypeAValue[ vs.ActiveA ];
-        if (  IsBetter(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == TRUE )
+        if (  IsBetter(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == true )
         {
           UpdateOutput(1, vs.ActiveA, zs, vs, InputMatrixB, gamma, lambda);
-          vs.Scratch = TRUE;
-          vs.NewMinimizerKnown = TRUE;
+          vs.Scratch = true;
+          vs.NewMinimizerKnown = true;
         }
         else
         {
@@ -678,11 +685,11 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
         CandidateA = 0;
         CandidateB = 0;
         CandidateC = zs.TypeAValue[ vs.ActiveA ];
-        if ( IsBetter( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == TRUE )
+        if ( IsBetter( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == true )
         {
           UpdateOutput(1, vs.ActiveA, zs, vs, InputMatrixB, gamma, lambda);
-          vs.Scratch = TRUE;
-          vs.NewMinimizerKnown = TRUE;
+          vs.Scratch = true;
+          vs.NewMinimizerKnown = true;
         }
         else
         {
@@ -691,15 +698,15 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
       }
       break;
     case 2:
-      vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = TRUE;
+      vs.ActiveB[ vs.PieceAdd[ vs.KnotTracker ] ] = true;
       CandidateA = zs.TypeBCoefA[ vs.PieceAdd[ vs.KnotTracker ] ];
       CandidateB = zs.TypeBCoefB[ vs.PieceAdd[ vs.KnotTracker ] ];
       CandidateC = zs.TypeBCoefC[ vs.PieceAdd[ vs.KnotTracker ] ];
-      if ( IsBetter(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == TRUE )
+      if ( IsBetter(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC, vs.y) == true )
       {
         UpdateOutput(2, vs.PieceAdd[ vs.KnotTracker ], zs, vs, InputMatrixB, gamma, lambda);
-        vs.Scratch = TRUE;
-        vs.NewMinimizerKnown = TRUE;
+        vs.Scratch = true;
+        vs.NewMinimizerKnown = true;
       }
       else
       {
@@ -709,7 +716,7 @@ void KnotDecide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrix
     }
   }
 
-  vs.WasLastIntersect = FALSE;
+  vs.WasLastIntersect = false;
   ++vs.KnotTracker;
 }
 
@@ -725,15 +732,15 @@ void Decide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrixB, c
     {
       if ( vs.IntersectLocation[ vs.IntersectOrder[ 0 ] ] < vs.KnotLocation[ vs.KnotTracker ] )
       {
-        vs.WasLastIntersect = TRUE;
+        vs.WasLastIntersect = true;
         vs.LastIntersectUpperRootTrue = vs.IntersectUpperRootTrue[ vs.IntersectOrder[ 0 ] ];
         vs.LastIntersectWhich = vs.MinimizerWhich;
         vs.LastIntersectPiece = vs.MinimizerPiece;
         vs.y = vs.IntersectLocation[ vs.IntersectOrder[ 0 ] ];
         vs.RangePiece = WhichPiece(vs.LeftKnot, vs.y - ( gamma * lambda ));
         UpdateOutput(vs.IntersectWhich[ vs.IntersectOrder[ 0 ] ], vs.IntersectPiece[ vs.IntersectOrder[ 0 ] ], zs, vs, InputMatrixB, gamma, lambda);
-        vs.Scratch = TRUE;
-        vs.NewMinimizerKnown = TRUE;
+        vs.Scratch = true;
+        vs.NewMinimizerKnown = true;
       }
       else
       {
@@ -742,15 +749,15 @@ void Decide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrixB, c
     }
     else
     {
-      vs.WasLastIntersect = TRUE;
+      vs.WasLastIntersect = true;
       vs.LastIntersectUpperRootTrue = vs.IntersectUpperRootTrue[ vs.IntersectOrder[ 0 ] ];
       vs.LastIntersectWhich = vs.MinimizerWhich;
       vs.LastIntersectPiece = vs.MinimizerPiece;
       vs.y = vs.IntersectLocation[ vs.IntersectOrder[ 0 ] ];
       vs.RangePiece = WhichPiece(vs.LeftKnot, vs.y - ( gamma * lambda ));
       UpdateOutput(vs.IntersectWhich[ vs.IntersectOrder[ 0 ] ], vs.IntersectPiece[ vs.IntersectOrder[ 0 ] ], zs, vs, InputMatrixB, gamma, lambda);
-      vs.Scratch = TRUE;
-      vs.NewMinimizerKnown = TRUE;
+      vs.Scratch = true;
+      vs.NewMinimizerKnown = true;
 
     }
   }
@@ -760,7 +767,7 @@ void Decide( const ab_struct& zs, var_struct& vs, NumericMatrix& InputMatrixB, c
   }
   else
   {
-    vs.FinishIteratation = TRUE;
+    vs.FinishIteratation = true;
   }
 }
 
@@ -824,7 +831,7 @@ IntegerVector OrderOfVector( NumericVector x )
   {
     data[ i ] = x[ i ];
   }
-  for ( int i = 0; i < index.size(); ++i ) {
+  for ( unsigned int i = 0; i < index.size(); ++i ) {
     index[ i ] = i;
   }
   sort(index.begin(), index.end(),
@@ -850,7 +857,8 @@ IntegerVector WhichMinimizes( double y, int& ActiveA, LogicalVector& ActiveB, in
   IntegerVector BestCouple(2);
   double BestSoFar = INFINITY;
   double ProspectiveValue;
-  int BestWhich, BestPiece;
+  int BestWhich;
+  int  BestPiece {};
   double BestMargin = INFINITY;
 
   // First check Type A minimizer
@@ -864,7 +872,7 @@ IntegerVector WhichMinimizes( double y, int& ActiveA, LogicalVector& ActiveB, in
   // Now check Type B minimizers
   for ( int i = RangePiece; i <= CurrentPiece; ++i )
   {
-    if ( ActiveB[ i ] == TRUE )
+    if ( ActiveB[ i ] == true )
     {
       ProspectiveValue = TypeBCoefA[ i ] * pow(y, 2) + TypeBCoefB[ i ] * y + TypeBCoefC[ i ];
       if ( ProspectiveValue - BestSoFar < 0 )
@@ -907,14 +915,14 @@ void ConstructIntersects( const int& UpperBoundPieces, const ab_struct& zs, var_
   // This searches through the active set, adding any intersections with the current minimizer
   vs.IntersectHowMany = 0;
   vs.IntersectCounter = -1;
-  vs.IntersectActive = LogicalVector(UpperBoundPieces, FALSE);
+  vs.IntersectActive = LogicalVector(UpperBoundPieces, false);
   double CandidateA, CandidateB, CandidateC;
   double RootAdd;
   int NumberOfPieces = vs.CoefA.size();
 
-  vs.ActiveIntersectA = FALSE;
-  vs.ActiveIntersectB = LogicalVector(NumberOfPieces, FALSE);
-  vs.ActiveIntersectC = FALSE;
+  vs.ActiveIntersectA = false;
+  vs.ActiveIntersectB = LogicalVector(NumberOfPieces, false);
+  vs.ActiveIntersectC = false;
 
   // First check Type A
   if ( vs.ActiveA != -1 )
@@ -929,11 +937,11 @@ void ConstructIntersects( const int& UpperBoundPieces, const ab_struct& zs, var_
       break;
     case 1:
       RootAdd = LowerRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 1, vs.ActiveA, FALSE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 1, vs.ActiveA, false, vs, gamma, lambda);
       break;
     case 2:
       RootAdd = UpperRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 1, vs.ActiveA, TRUE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 1, vs.ActiveA, true, vs, gamma, lambda);
       break;
     }
   }
@@ -941,7 +949,7 @@ void ConstructIntersects( const int& UpperBoundPieces, const ab_struct& zs, var_
   // Now check Type B
   for ( int i = vs.RangePiece; i <= vs.CurrentPiece; ++i )
   {
-    if ( vs.ActiveB[ i ] == TRUE )
+    if ( vs.ActiveB[ i ] == true )
     {
       CandidateA = zs.TypeBCoefA[ i ];
       CandidateB = zs.TypeBCoefB[ i ];
@@ -953,11 +961,11 @@ void ConstructIntersects( const int& UpperBoundPieces, const ab_struct& zs, var_
         break;
       case 1:
         RootAdd = LowerRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-        IntersectAdd(RootAdd, 2, i, FALSE, vs, gamma, lambda);
+        IntersectAdd(RootAdd, 2, i, false, vs, gamma, lambda);
         break;
       case 2:
         RootAdd = UpperRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-        IntersectAdd(RootAdd, 2, i, TRUE, vs, gamma, lambda);
+        IntersectAdd(RootAdd, 2, i, true, vs, gamma, lambda);
         break;
       }
     }
@@ -974,11 +982,11 @@ void ConstructIntersects( const int& UpperBoundPieces, const ab_struct& zs, var_
     break;
   case 1:
     RootAdd = LowerRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-    IntersectAdd(RootAdd, 3, vs.CurrentPiece, FALSE, vs, gamma, lambda);
+    IntersectAdd(RootAdd, 3, vs.CurrentPiece, false, vs, gamma, lambda);
     break;
   case 2:
     RootAdd = UpperRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-    IntersectAdd(RootAdd, 3, vs.CurrentPiece, TRUE, vs, gamma, lambda);
+    IntersectAdd(RootAdd, 3, vs.CurrentPiece, true, vs, gamma, lambda);
     break;
   }
 
@@ -994,18 +1002,18 @@ void IntersectAdd( double Location, int Which, int Piece, bool UpperRootTrue, va
   vs.IntersectLocation[ vs.IntersectCounter ] = Location;
   vs.IntersectWhich[ vs.IntersectCounter ] = Which;
   vs.IntersectPiece[ vs.IntersectCounter ] = Piece;
-  vs.IntersectActive[ vs.IntersectCounter ] = TRUE;
+  vs.IntersectActive[ vs.IntersectCounter ] = true;
   vs.IntersectUpperRootTrue[ vs.IntersectCounter ] = UpperRootTrue;
   switch ( Which )
   {
   case 1:
-    vs.ActiveIntersectA = TRUE;
+    vs.ActiveIntersectA = true;
     break;
   case 2:
-    vs.ActiveIntersectB[ Piece ] = TRUE;
+    vs.ActiveIntersectB[ Piece ] = true;
     break;
   case 3:
-    vs.ActiveIntersectC = TRUE;
+    vs.ActiveIntersectC = true;
     break;
   }
   ++vs.IntersectHowMany;
@@ -1033,12 +1041,12 @@ void IntersectAddOuter( int Which, int Piece,
       break;
     case 1:
       RootAdd = LowerRoot(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 1, Piece, FALSE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 1, Piece, false, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     case 2:
       RootAdd = UpperRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 1, Piece, TRUE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 1, Piece, true, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     }
@@ -1054,12 +1062,12 @@ void IntersectAddOuter( int Which, int Piece,
       break;
     case 1:
       RootAdd = LowerRoot(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 2, Piece, FALSE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 2, Piece, false, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     case 2:
       RootAdd = UpperRoot(vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 2, Piece, TRUE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 2, Piece, true, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     }
@@ -1075,12 +1083,12 @@ void IntersectAddOuter( int Which, int Piece,
       break;
     case 1:
       RootAdd = LowerRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 3, Piece, FALSE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 3, Piece, false, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     case 2:
       RootAdd = UpperRoot( vs.MinimizerA, vs.MinimizerB, vs.MinimizerC, CandidateA, CandidateB, CandidateC);
-      IntersectAdd(RootAdd, 3, Piece, TRUE, vs, gamma, lambda);
+      IntersectAdd(RootAdd, 3, Piece, true, vs, gamma, lambda);
       OrderIntersectOrder(vs.IntersectOrder, vs.IntersectLocation, vs.IntersectActive, vs.IntersectCounter, vs.IntersectIndex, vs.IntersectHowMany);
       break;
     }
@@ -1098,7 +1106,7 @@ void IntersectRemove( int Which, int Piece, var_struct& vs, const double& gamma,
 
   while ( ( i <= vs.IntersectCounter ) and ( RemoveIdentifier == -1 ) )
   {
-    if ( ( vs.IntersectPiece[ i ] == Piece ) and ( vs.IntersectWhich[ i ] == Which ) and ( vs.IntersectActive[ i ] == TRUE ) )
+    if ( ( vs.IntersectPiece[ i ] == Piece ) and ( vs.IntersectWhich[ i ] == Which ) and ( vs.IntersectActive[ i ] == true ) )
     {
       RemoveIdentifier = i;
     }
@@ -1107,17 +1115,17 @@ void IntersectRemove( int Which, int Piece, var_struct& vs, const double& gamma,
 
   if ( RemoveIdentifier >= 0 )
   {
-    vs.IntersectActive[ RemoveIdentifier ] = FALSE;
+    vs.IntersectActive[ RemoveIdentifier ] = false;
     switch ( Which )
     {
     case 1:
-      vs.ActiveIntersectA = FALSE;
+      vs.ActiveIntersectA = false;
       break;
     case 2:
-      vs.ActiveIntersectB[ Piece ] = FALSE;
+      vs.ActiveIntersectB[ Piece ] = false;
       break;
     case 3:
-      vs.ActiveIntersectC = FALSE;
+      vs.ActiveIntersectC = false;
       break;
     }
     --vs.IntersectHowMany;
@@ -1232,11 +1240,11 @@ bool IsBetter( double OldA, double OldB, double OldC, double NewA, double NewB, 
   double OldGradient, NewGradient, OldCurvature, NewCurvature;
   if ( NewValue - OldValue + tol1 < 0 )
   {
-    return TRUE;
+    return true;
   }
   else if ( OldValue - NewValue + tol1 < 0 )
   {
-    return FALSE;
+    return false;
   }
   else
   {
@@ -1244,11 +1252,11 @@ bool IsBetter( double OldA, double OldB, double OldC, double NewA, double NewB, 
     NewGradient = 2 * NewA * y + NewB;
     if ( NewGradient - OldGradient + tol1 < 0 )
     {
-      return TRUE;
+      return true;
     }
     else if ( OldGradient - NewGradient + tol1 < 0 )
     {
-      return FALSE;
+      return false;
     }
     else
     {
@@ -1256,15 +1264,15 @@ bool IsBetter( double OldA, double OldB, double OldC, double NewA, double NewB, 
       NewCurvature = 2 * NewA;
       if ( NewCurvature - OldCurvature + tol1 < 0 )
       {
-        return TRUE;
+        return true;
       }
       else if ( OldCurvature - NewCurvature + tol1 < 0 )
       {
-        return FALSE;
+        return false;
       }
       else
       {
-        return FALSE;
+        return false;
       }
     }
   }
@@ -1282,7 +1290,7 @@ void UpdateOutput( const int NewMinimizerWhich, const int NewMinimizerPiece, con
   vs.OCoefB[ vs.OutputCounter ] = vs.MinimizerB;
   vs.OCoefC[ vs.OutputCounter ] = vs.MinimizerC;
 
-  if ( vs.FinishIteratation == FALSE )
+  if ( vs.FinishIteratation == false )
   {
     vs.OLeftKnot[ vs.OutputCounter + 1 ] = vs.y;
   }
@@ -1318,7 +1326,7 @@ void UpdateOutput( const int NewMinimizerWhich, const int NewMinimizerPiece, con
   }
 
   // If this is not at the end of the iteration, prepare for the next computation
-  if ( vs.FinishIteratation == FALSE )
+  if ( vs.FinishIteratation == false )
   {
     vs.MinimizerWhich = NewMinimizerWhich;
     vs.MinimizerPiece = NewMinimizerPiece;
@@ -1353,10 +1361,10 @@ int ShouldAddIntersect( double y, int MinimizerWhich, int MinimizerPiece, int Ca
 {
   // Should candidate intersection be added to the set of intersections with the current minimizer
   double ProspectiveRoot;
-  bool EventuallyCandidate = FALSE;
+  bool EventuallyCandidate = false;
   if ( CandidateA - MinimizerA < 0 )
   {
-    EventuallyCandidate = TRUE;
+    EventuallyCandidate = true;
   }
 
   if ( ( MinimizerWhich == CandidateWhich ) and ( MinimizerPiece == CandidatePiece ) )
@@ -1365,8 +1373,8 @@ int ShouldAddIntersect( double y, int MinimizerWhich, int MinimizerPiece, int Ca
   }
   else
   {
-    if ( ( EventuallyCandidate ) and ( ( WasLastIntersect == FALSE ) or ( LastIntersectWhich != CandidateWhich )
-                                         or ( LastIntersectPiece != CandidatePiece ) or ( LastIntersectUpperRootTrue == FALSE ) ) )
+    if ( ( EventuallyCandidate ) and ( ( WasLastIntersect == false ) or ( LastIntersectWhich != CandidateWhich )
+                                         or ( LastIntersectPiece != CandidatePiece ) or ( LastIntersectUpperRootTrue == false ) ) )
     {
       ProspectiveRoot = UpperRoot( MinimizerA, MinimizerB, MinimizerC, CandidateA, CandidateB, CandidateC);
       if ( ProspectiveRoot - y > 0 )
@@ -1378,8 +1386,8 @@ int ShouldAddIntersect( double y, int MinimizerWhich, int MinimizerPiece, int Ca
         return 0;
       }
     }
-    else if ( ( WasLastIntersect == FALSE ) or ( LastIntersectWhich != CandidateWhich )
-                or ( LastIntersectPiece != CandidatePiece ) or ( LastIntersectUpperRootTrue == TRUE ) )
+    else if ( ( WasLastIntersect == false ) or ( LastIntersectWhich != CandidateWhich )
+                or ( LastIntersectPiece != CandidatePiece ) or ( LastIntersectUpperRootTrue == true ) )
     {
       ProspectiveRoot = LowerRoot( MinimizerA, MinimizerB, MinimizerC, CandidateA, CandidateB, CandidateC);
       if ( ProspectiveRoot > y )
@@ -1405,10 +1413,10 @@ void Compute( const int& UpperBoundPieces, const ab_struct& zs, var_struct& vs, 
   // Highest level function called in each iteration
   int NewMinimizerWhich, NewMinimizerPiece;
   IntegerVector BestCouple;
-  if ( vs.Scratch == TRUE )
+  if ( vs.Scratch == true )
   {
     vs.RangePiece = WhichPiece(vs.LeftKnot, vs.y - ( gamma * lambda ));
-    if ( vs.NewMinimizerKnown == FALSE )
+    if ( vs.NewMinimizerKnown == false )
     {
 
       BestCouple = WhichMinimizes(vs.y, vs.ActiveA, vs.ActiveB, vs.CurrentPiece, vs.RangePiece, vs.CoefA, vs.CoefB, vs.CoefC, zs.TypeAValue, zs.TypeBCoefA,
@@ -1418,7 +1426,7 @@ void Compute( const int& UpperBoundPieces, const ab_struct& zs, var_struct& vs, 
       UpdateOutput(NewMinimizerWhich, NewMinimizerPiece, zs, vs, InputMatrixB, gamma, lambda); //Update the output here as soon as we realise what we're moving over to.
     }
     ConstructIntersects(UpperBoundPieces, zs, vs, gamma, lambda);
-    vs.Scratch = FALSE;
+    vs.Scratch = false;
   }
   Decide(zs, vs, InputMatrixB, gamma, lambda);
 }

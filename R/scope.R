@@ -11,7 +11,7 @@
 #' @param x Data frame of covariates: Can include a mix of continuous and categorical variables (no scaling of continuous covariates is performed within the program).
 #' By default an intercept will be added to the linear part; see include_intercept
 #' @param y Response vector of length n
-#' @param gamma Concavity parameter in MCP; see Zhang (2010) Nearly unbiased estimation with minimax concave penalty
+#' @param gamma Concavity parameter in MCP; see Zhang (2010) 
 #' @param lambda If NULL default sequence will be generated. Matrix of values (p_categorical times nlambda) of penalty parameter lambda. Must be non-negative and each row decreasing. Note that if lambda = 0 then no shrinkage will occur.
 #' @param nlambda Length of default sequence of lambda values generated if lambda = NULL
 #' @param lambda_min_ratio Ratio of largest to smallest value on default sequence of lambda values
@@ -21,7 +21,7 @@
 #' @param max_iter Maximum number of iterations at each point on the lambda path
 #' @param early_stopping Early stopping based on information criterion. By default is TRUE if there are more than 1 categorical variables
 #' @param early_stopping_rounds Number of iterations that information criterion must have not decreased for to terminate
-#' @param early_stopping_criterion If "AIC", Akaike Information Criterion is used for early stopping. Otherwise if a positive number is given, modified Bayes Information Criterion is used with this integer as the parameter (CITE)
+#' @param early_stopping_criterion If "AIC", Akaike Information Criterion is used for early stopping. Otherwise if a positive number is given, modified Bayes Information Criterion is used with this integer as the parameter (Wang et al., 2009)
 #' @param noise_variance If noise variance is known, this will be used for scaling the default values of lambda. Otherwise this will be scaled automatically
 #' @param terminate_eps Epsilon for convergence criterion, is multiplied by null deviance to get terminate criterion for objective value
 #' @param silent If FALSE then progress updates will be printed as solutions are computed. Useful for tuning and diagnosing convergence issues.
@@ -51,8 +51,11 @@
 #' scope_mod = scope(x, y)
 #' x_new = UniformDesignMatrix (10, 5, 8)
 #' predict(scope_mod, x_new)
+#' 
+#' @references \insertRef{zhang2010}{CatReg}
+#' @references \insertRef{wangli2009}{CatReg}
+#'
 #' @export
-
 
 scope = function ( x, y, gamma = 8, lambda = NULL, nlambda = 100, lambda_min_ratio = 0.01, nfolds = 5, include_intercept = TRUE, return_full_beta = FALSE,
                    max_iter = 1000, early_stopping = ifelse(pshrink > 1, TRUE, FALSE), early_stopping_rounds = 20, early_stopping_criterion = "AIC", noise_variance = NULL, 
